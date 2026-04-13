@@ -1,7 +1,16 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
 /**
- * Prevents multiple Prisma Client instances in development due to hot reloading.
+ * Prisma runtime adapter for the app.
+ * This uses the pooled Supabase connection string from DATABASE_URL.
+ */
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+/**
+ * Prevent multiple Prisma Client instances in development.
  */
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -10,6 +19,7 @@ const globalForPrisma = globalThis as unknown as {
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 
