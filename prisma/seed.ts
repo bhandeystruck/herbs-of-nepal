@@ -17,15 +17,10 @@ const prisma = new PrismaClient({
 async function main() {
   console.log("Starting seed...");
 
-  /**
-   * Clear old data while schema is evolving.
-   */
+  await prisma.blogPost.deleteMany();
   await prisma.herb.deleteMany();
   await prisma.category.deleteMany();
 
-  /**
-   * Create categories first.
-   */
   const immunityCategory = await prisma.category.create({
     data: {
       name: "Immunity",
@@ -50,9 +45,6 @@ async function main() {
     },
   });
 
-  /**
-   * Seed herbs using your preferred structure plus the richer production fields.
-   */
   await prisma.herb.createMany({
     data: [
       {
@@ -69,11 +61,7 @@ async function main() {
           "Commonly used for cough and cold relief",
           "Traditionally valued for stress support",
         ],
-        uses: [
-          "Herbal tea",
-          "Home remedies",
-          "Traditional daily wellness use",
-        ],
+        uses: ["Herbal tea", "Home remedies", "Traditional daily wellness use"],
         precautions: [
           "Should not replace medical treatment",
           "Consult a professional before medicinal use during pregnancy",
@@ -105,11 +93,7 @@ async function main() {
           "Commonly associated with oral care support",
           "Used in Himalayan herbal practices",
         ],
-        uses: [
-          "Spice blends",
-          "Traditional remedies",
-          "Infusions and local preparations",
-        ],
+        uses: ["Spice blends", "Traditional remedies", "Infusions and local preparations"],
         precautions: [
           "Use moderately",
           "Consult a professional before therapeutic use",
@@ -141,11 +125,7 @@ async function main() {
           "Commonly used in warming herbal preparations",
           "Often included in seasonal home remedies",
         ],
-        uses: [
-          "Tea",
-          "Cooking",
-          "Traditional home remedies",
-        ],
+        uses: ["Tea", "Cooking", "Traditional home remedies"],
         precautions: [
           "Use carefully if medically advised to avoid certain herbs",
           "Consult a professional before therapeutic use",
@@ -162,6 +142,50 @@ async function main() {
         seoDescription:
           "Discover Ginger, its traditional uses in Nepal, digestive benefits, preparation methods, and precautions.",
         categoryId: digestiveCategory.id,
+      },
+    ],
+  });
+
+  await prisma.blogPost.createMany({
+    data: [
+      {
+        title: "Why Nepalese Herbs Matter in Traditional Wellness",
+        slug: "why-nepalese-herbs-matter-in-traditional-wellness",
+        excerpt:
+          "An introduction to why herbs hold an important place in Nepalese households, traditions, and everyday wellness practices.",
+        content:
+          "Nepalese herbal knowledge is deeply connected to local tradition, geography, and everyday life. Across villages, towns, and cities, herbs have long been used in food, rituals, home preparations, and seasonal wellness practices. Understanding these herbs means understanding a living cultural tradition shaped by mountains, biodiversity, and generations of shared knowledge.",
+        featuredImageUrl: null,
+        isPublished: true,
+        seoTitle: "Why Nepalese Herbs Matter | Herbs of Nepal",
+        seoDescription:
+          "Explore why Nepalese herbs remain important in traditional wellness, cultural knowledge, and daily life.",
+      },
+      {
+        title: "Understanding Tulsi in Nepalese Households",
+        slug: "understanding-tulsi-in-nepalese-households",
+        excerpt:
+          "Tulsi is more than a herb. It carries cultural, spiritual, and everyday wellness significance across Nepalese homes.",
+        content:
+          "Tulsi is among the most recognizable herbs in Nepalese life. It is often grown at home, used in warm drinks, and valued for its place in both traditional wellness and cultural practice. Its presence reflects how herbs can hold both practical and symbolic importance at the same time.",
+        featuredImageUrl: null,
+        isPublished: true,
+        seoTitle: "Understanding Tulsi in Nepalese Households | Herbs of Nepal",
+        seoDescription:
+          "Learn why Tulsi is culturally and traditionally significant in Nepalese households.",
+      },
+      {
+        title: "Timur: The Himalayan Spice with Traditional Value",
+        slug: "timur-the-himalayan-spice-with-traditional-value",
+        excerpt:
+          "Timur is known for its distinctive flavor and long-standing place in local food and traditional herbal practices.",
+        content:
+          "Timur stands out for its tingling, citrus-like character and its long association with local preparation methods in Himalayan regions. It appears both as a culinary ingredient and as part of traditional household knowledge, making it an important herb-spice in the Nepalese context.",
+        featuredImageUrl: null,
+        isPublished: true,
+        seoTitle: "Timur Traditional Uses and Value | Herbs of Nepal",
+        seoDescription:
+          "Discover Timur, a Himalayan spice-herb valued in Nepalese food and traditional practices.",
       },
     ],
   });

@@ -33,4 +33,26 @@ export const SITE_CONFIG = {
       href: "/safety",
     },
   ],
+  footerLinks: [
+    {
+      label: "Herbs",
+      href: "/herbs",
+    },
+    {
+      label: "Categories",
+      href: "/categories",
+    },
+    {
+      label: "Blog",
+      href: "/blog",
+    },
+    {
+      label: "About",
+      href: "/about",
+    },
+    {
+      label: "Safety",
+      href: "/safety",
+    },
+  ],
 } as const;
