@@ -1,14 +1,71 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  herbs Herb[]
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Herb {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  nepaliName       String?
+  scientificName   String?
+  shortDescription String
+  description      String
+  benefits         Json
+  uses             Json
+  precautions      Json
+  sideEffects      String?
+  dosageNotes      String?
+  region           String?
+  image            String?
+  featured         Boolean  @default(false)
+  isPublished      Boolean  @default(true)
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([slug])
+  @@index([featured])
+  @@index([isPublished])
+  @@index([categoryId])
+  @@map("herbs")
+}
+
+model BlogPost {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  excerpt          String
+  content          String
+  featuredImageUrl String?
+  isPublished      Boolean  @default(false)
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+  @@map("blog_posts")
 }
