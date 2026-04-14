@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { BlogPreviewCard } from "@/components/blog/blog-preview-card";
+import { CategoryCard } from "@/components/herbs/category-card";
+import { FeaturedHerbSpotlight } from "@/components/herbs/featured-herb-spotlight";
+import { HerbCard } from "@/components/herbs/herb-card";
 import { Container } from "@/components/layout/container";
-import { getFeaturedHerbs } from "@/features/herbs/queries";
+import { getLatestPublishedBlogPosts } from "@/features/blog/queries";
 import { getCategories } from "@/features/categories/queries";
+import { getFeaturedHerbs } from "@/features/herbs/queries";
 import { createMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createMetadata({
@@ -12,120 +17,188 @@ export const metadata = createMetadata({
 });
 
 /**
- * Public homepage using real database data.
+ * Public homepage using real database content.
  */
 export default async function HomePage() {
-  const [featuredHerbs, categories] = await Promise.all([
+  const [featuredHerbs, categories, latestPosts] = await Promise.all([
     getFeaturedHerbs(3),
     getCategories(),
+    getLatestPublishedBlogPosts(3),
   ]);
 
+  const spotlightHerb = featuredHerbs[0] ?? null;
+  const remainingFeaturedHerbs = featuredHerbs.slice(1);
+  const homepageCategories = categories.slice(0, 3);
+
   return (
-    <main className="py-16 sm:py-24">
-      <Container>
-        <section className="max-w-3xl space-y-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
-            Nepalese Herbal Knowledge
-          </p>
+    <main className="pb-16 sm:pb-24">
+      <section className="border-b border-stone-200 bg-gradient-to-b from-emerald-50 to-stone-50">
+        <Container className="py-16 sm:py-24">
+          <div className="max-w-4xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+              Nepalese Herbal Knowledge
+            </p>
 
-          <h1 className="text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
-            Discover the wisdom of Nepalese herbs.
-          </h1>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl lg:text-6xl">
+              Discover the healing heritage of Nepalese herbs.
+            </h1>
 
-          <p className="text-lg leading-8 text-stone-600">
-            Explore traditional herbal knowledge, benefits, cultural relevance,
-            preparation methods, and safety guidance through a clean, modern
-            educational platform.
-          </p>
-        </section>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-stone-600">
+              Explore herbs from Nepal through a modern educational platform that
+              highlights traditional uses, cultural importance, and responsible
+              safety guidance.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                href="/herbs"
+                className="inline-flex rounded-full bg-emerald-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+              >
+                Explore herbs
+              </Link>
+
+              <Link
+                href="/blog"
+                className="inline-flex rounded-full border border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+              >
+                Read articles
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <Container className="pt-16 sm:pt-20">
+        {spotlightHerb ? (
+          <section>
+            <FeaturedHerbSpotlight
+              herb={{
+                id: spotlightHerb.id,
+                slug: spotlightHerb.slug,
+                name: spotlightHerb.name,
+                nepaliName: spotlightHerb.nepaliName,
+                scientificName: spotlightHerb.scientificName,
+                shortDescription: spotlightHerb.shortDescription,
+                description: spotlightHerb.description,
+                region: spotlightHerb.region,
+                category: {
+                  name: spotlightHerb.category.name,
+                  slug: spotlightHerb.category.slug,
+                },
+              }}
+            />
+          </section>
+        ) : null}
 
         <section className="mt-16">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight text-stone-900">
-              Featured Herbs
-            </h2>
-            <p className="mt-2 text-sm text-stone-600">
-              A few important herbs from our growing Nepalese herb library.
-            </p>
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                Featured Herbs
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-stone-900">
+                Continue exploring the library
+              </h2>
+            </div>
+
+            <Link
+              href="/herbs"
+              className="hidden text-sm font-medium text-emerald-700 transition hover:text-emerald-800 sm:inline-flex"
+            >
+              View all herbs →
+            </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {featuredHerbs.map((herb) => (
-              <article
+          <div className="grid gap-6 md:grid-cols-2">
+            {remainingFeaturedHerbs.map((herb) => (
+              <HerbCard
                 key={herb.id}
-                className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-              >
-                <div className="mb-4 space-y-2">
-                  {herb.nepaliName ? (
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-                      {herb.nepaliName}
-                    </p>
-                  ) : null}
-
-                  <h3 className="text-xl font-semibold text-stone-900">
-                    {herb.name}
-                  </h3>
-
-                  {herb.scientificName ? (
-                    <p className="text-sm italic text-stone-500">
-                      {herb.scientificName}
-                    </p>
-                  ) : null}
-
-                  <p className="text-xs font-medium text-stone-500">
-                    {herb.category.name}
-                  </p>
-                </div>
-
-                <p className="text-sm leading-7 text-stone-600">
-                  {herb.shortDescription}
-                </p>
-
-                <div className="mt-6">
-                  <Link
-                    href={`/herbs/${herb.slug}`}
-                    className="text-sm font-medium text-emerald-700 transition hover:text-emerald-800"
-                  >
-                    Read more →
-                  </Link>
-                </div>
-              </article>
+                herb={{
+                  id: herb.id,
+                  slug: herb.slug,
+                  name: herb.name,
+                  nepaliName: herb.nepaliName,
+                  scientificName: herb.scientificName,
+                  shortDescription: herb.shortDescription,
+                  region: herb.region,
+                  image: herb.image,
+                  featured: herb.featured,
+                  category: {
+                    name: herb.category.name,
+                    slug: herb.category.slug,
+                  },
+                }}
+              />
             ))}
           </div>
         </section>
 
         <section className="mt-16">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight text-stone-900">
-              Browse by Category
-            </h2>
-            <p className="mt-2 text-sm text-stone-600">
-              Explore herbs by traditional use and wellness focus.
-            </p>
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                Categories
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-stone-900">
+                Browse by wellness focus
+              </h2>
+            </div>
+
+            <Link
+              href="/categories"
+              className="hidden text-sm font-medium text-emerald-700 transition hover:text-emerald-800 sm:inline-flex"
+            >
+              View all categories →
+            </Link>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {categories.map((category) => (
-              <div
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {homepageCategories.map((category) => (
+              <CategoryCard
                 key={category.id}
-                className="rounded-2xl border border-stone-200 bg-stone-50 p-5"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-stone-900">
-                      {category.name}
-                    </h3>
+                category={{
+                  id: category.id,
+                  name: category.name,
+                  slug: category.slug,
+                  description: category.description,
+                  herbCount: category.herbCount,
+                }}
+              />
+            ))}
+          </div>
+        </section>
 
-                    <p className="mt-2 text-sm leading-6 text-stone-600">
-                      {category.description ?? "Category description coming soon."}
-                    </p>
-                  </div>
+        <section className="mt-16">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                Latest Articles
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-stone-900">
+                Learn through longer-form content
+              </h2>
+            </div>
 
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-stone-700 text-center">
-                    {category.herbCount} herbs
-                  </span>
-                </div>
-              </div>
+            <Link
+              href="/blog"
+              className="hidden text-sm font-medium text-emerald-700 transition hover:text-emerald-800 sm:inline-flex"
+            >
+              View all articles →
+            </Link>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {latestPosts.map((post) => (
+              <BlogPreviewCard
+                key={post.id}
+                post={{
+                  id: post.id,
+                  title: post.title,
+                  slug: post.slug,
+                  excerpt: post.excerpt,
+                  createdAt: post.createdAt,
+                }}
+              />
             ))}
           </div>
         </section>
@@ -133,13 +206,12 @@ export default async function HomePage() {
         <section className="mt-16 rounded-3xl bg-emerald-900 px-6 py-10 text-white sm:px-10">
           <div className="max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Building a trusted herbal knowledge platform
+              Learn with curiosity, use with caution
             </h2>
 
             <p className="mt-4 text-sm leading-7 text-emerald-50/90 sm:text-base">
-              Our goal is to present Nepalese herbal knowledge in a clear,
-              educational, culturally respectful, and responsibly structured
-              format.
+              This platform is designed to help users explore Nepalese herbal
+              knowledge responsibly while respecting cultural context and safety.
             </p>
 
             <div className="mt-6">

@@ -26,3 +26,18 @@ export async function getPublishedBlogPostBySlug(slug: string) {
     },
   });
 }
+
+/**
+ * Fetches the latest published blog posts for homepage previews.
+ */
+export async function getLatestPublishedBlogPosts(limit = 3) {
+  return db.blogPost.findMany({
+    where: {
+      isPublished: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: limit,
+  });
+}

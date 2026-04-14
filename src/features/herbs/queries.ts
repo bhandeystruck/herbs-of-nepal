@@ -1,5 +1,25 @@
 import { db } from "@/lib/prisma/client";
-import type { HerbFilters } from "@/features/herbs/types";
+import type { HerbFilters, HerbSort } from "@/features/herbs/types";
+
+function getOrderBy(sort: HerbSort | undefined) {
+  switch (sort) {
+    case "newest":
+      return [{ createdAt: "desc" as const }];
+
+    case "name-asc":
+      return [{ name: "asc" as const }];
+
+    case "name-desc":
+      return [{ name: "desc" as const }];
+
+    case "featured":
+    default:
+      return [
+        { featured: "desc" as const },
+        { createdAt: "desc" as const },
+      ];
+  }
+}
 
 /**
  * Fetches all published herbs for public pages.
@@ -7,6 +27,7 @@ import type { HerbFilters } from "@/features/herbs/types";
 export async function getPublishedHerbs(filters: HerbFilters = {}) {
   const normalizedQuery = filters.query?.trim();
   const normalizedCategory = filters.category?.trim();
+  const sort = filters.sort ?? "featured";
 
   return db.herb.findMany({
     where: {
@@ -59,7 +80,7 @@ export async function getPublishedHerbs(filters: HerbFilters = {}) {
     include: {
       category: true,
     },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    orderBy: getOrderBy(sort),
   });
 }
 

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { SITE_CONFIG } from "@/lib/constants/site";
+import { HeaderSearch } from "@/components/layout/header-search";
 
 /**
  * Simple mobile navigation for smaller screens.
@@ -29,6 +30,10 @@ export function MobileNav() {
       {isOpen ? (
         <div className="absolute inset-x-0 top-full z-50 border-b border-stone-200 bg-stone-50 shadow-sm">
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+            <div className="mb-4">
+              <HeaderSearch mobile onSubmitComplete={() => setIsOpen(false)} />
+            </div>
+
             <nav className="flex flex-col gap-2">
               {SITE_CONFIG.navLinks.map((link) => {
                 const isActive =

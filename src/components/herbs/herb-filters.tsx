@@ -23,10 +23,16 @@ export function HerbFilters({ categories }: HerbFiltersProps) {
   const currentQuery = searchParams.get("q") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
   const currentFeatured = searchParams.get("featured") ?? "";
+  const currentSort = searchParams.get("sort") ?? "featured";
 
   const hasActiveFilters = useMemo(() => {
-    return Boolean(currentQuery || currentCategory || currentFeatured);
-  }, [currentCategory, currentFeatured, currentQuery]);
+    return Boolean(
+      currentQuery ||
+        currentCategory ||
+        currentFeatured ||
+        (currentSort && currentSort !== "featured")
+    );
+  }, [currentCategory, currentFeatured, currentQuery, currentSort]);
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -46,7 +52,7 @@ export function HerbFilters({ categories }: HerbFiltersProps) {
 
   return (
     <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr_auto_auto]">
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
         <div>
           <label
             htmlFor="herb-search"
@@ -101,6 +107,26 @@ export function HerbFilters({ categories }: HerbFiltersProps) {
           >
             <option value="">All herbs</option>
             <option value="true">Featured only</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            htmlFor="sort-by"
+            className="mb-2 block text-sm font-medium text-stone-700"
+          >
+            Sort by
+          </label>
+          <select
+            id="sort-by"
+            value={currentSort}
+            onChange={(event) => updateParam("sort", event.target.value)}
+            className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+          >
+            <option value="featured">Featured first</option>
+            <option value="newest">Newest first</option>
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
           </select>
         </div>
 

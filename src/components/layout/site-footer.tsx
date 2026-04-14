@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Leaf } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { SITE_CONFIG } from "@/lib/constants/site";
+import Image from "next/image";
 
 /**
  * Main public site footer.
@@ -14,10 +14,14 @@ export function SiteFooter() {
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-100 ring-1 ring-emerald-200">
-                <Leaf className="h-5 w-5 text-emerald-700" />
+              <span className="flex h-11 w-11 items-center justify-center rounded-full ">
+                  <Image
+                    src="/branding/herbs-of-nepal-logo.svg"
+                    alt="Herbs of Nepal logo"
+                    height={200}
+                    width={200}
+                  />
               </span>
-
               <div>
                 <h2 className="text-lg font-semibold tracking-tight text-stone-900">
                   {SITE_CONFIG.name}
