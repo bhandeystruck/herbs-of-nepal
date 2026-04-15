@@ -85,7 +85,7 @@ export async function getPublishedHerbs(filters: HerbFilters = {}) {
 }
 
 /**
- * Fetches a single published herb by slug.
+ * Fetches a single published herb by slug with trust/source metadata.
  */
 export async function getPublishedHerbBySlug(slug: string) {
   return db.herb.findFirst({
@@ -95,6 +95,12 @@ export async function getPublishedHerbBySlug(slug: string) {
     },
     include: {
       category: true,
+      sources: {
+        include: {
+          source: true,
+        },
+        orderBy: [{ section: "asc" }, { displayOrder: "asc" }],
+      },
     },
   });
 }

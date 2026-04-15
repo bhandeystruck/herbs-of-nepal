@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/container";
+import { HerbSourcesList } from "@/components/herbs/herb-source-list";
+import { HerbTrustPanel } from "@/components/herbs/herb-trust-panel";
 import { getPublishedHerbBySlug } from "@/features/herbs/queries";
 import { SITE_CONFIG } from "@/lib/constants/site";
 import { jsonToStringArray } from "@/lib/utils/json";
+import Image from "next/image";
+import { getHerbImageUrl } from "@/lib/utils/media";
 
 type HerbDetailPageProps = {
   params: Promise<{
@@ -34,7 +38,7 @@ export async function generateMetadata({
 }
 
 /**
- * Dynamic herb detail page.
+ * Dynamic herb detail page with trust signals and sources.
  */
 export default async function HerbDetailPage({
   params,
@@ -49,6 +53,7 @@ export default async function HerbDetailPage({
   const benefits = jsonToStringArray(herb.benefits);
   const uses = jsonToStringArray(herb.uses);
   const precautions = jsonToStringArray(herb.precautions);
+  const herbImageUrl = getHerbImageUrl(herb.imagePath);
 
   return (
     <main className="py-16 sm:py-24">
@@ -81,12 +86,12 @@ export default async function HerbDetailPage({
             ) : null}
 
             <div className="flex flex-wrap gap-3 pt-2">
-             <Link
+              <Link
                 href={`/herbs?category=${herb.category.slug}`}
                 className="rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700 transition hover:bg-stone-200"
-                >
+              >
                 {herb.category.name}
-            </Link>
+              </Link>
 
               {herb.region ? (
                 <span className="rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700">
@@ -105,6 +110,41 @@ export default async function HerbDetailPage({
               {herb.shortDescription}
             </p>
           </header>
+
+          <HerbTrustPanel
+            evidenceLevel={herb.evidenceLevel}
+            lastReviewedAt={herb.lastReviewedAt}
+            reviewedByName={herb.reviewedByName}
+            reviewedByRole={herb.reviewedByRole}
+            editorialSummary={herb.editorialSummary}
+            sourceCount={herb.sources.length}
+          />
+
+          {herbImageUrl ? (
+            <section className="mt-10 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+              <div className="relative aspect-[16/9] w-full">
+                <Image
+                  src={herbImageUrl}
+                  alt={herb.imageAlt ?? `${herb.name} herb image`}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+
+              <div className="border-t border-stone-200 bg-stone-50 px-5 py-4">
+                <p className="text-sm font-medium text-stone-800">
+                  Real plant image
+                </p>
+
+                <p className="mt-1 text-xs leading-6 text-stone-600">
+                  {herb.imageSourceName ?? "Source metadata not yet listed"}
+                  {herb.imageLicense ? ` • ${herb.imageLicense}` : ""}
+                </p>
+              </div>
+            </section>
+          ) : null}
 
           <section className="mt-10">
             <h2 className="text-2xl font-semibold text-stone-900">
@@ -165,35 +205,62 @@ export default async function HerbDetailPage({
             )}
           </section>
 
-          {(herb.sideEffects || herb.dosageNotes) ? (
-            <section className="mt-10 rounded-2xl border border-stone-200 bg-stone-50 p-6">
-              <h2 className="text-2xl font-semibold text-stone-900">
-                Safety Notes
-              </h2>
+{(herb.sideEffects || herb.dosageNotes) ? (
+  <section className="relative mt-10 overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-rose-50 p-6 shadow-sm sm:p-8">
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-200/30 blur-3xl" />
+      <div className="absolute -left-8 bottom-0 h-24 w-24 rounded-full bg-rose-200/20 blur-3xl" />
+    </div>
 
-              {herb.sideEffects ? (
-                <div className="mt-4">
-                  <h3 className="text-base font-semibold text-stone-900">
-                    Side Effects
-                  </h3>
-                  <p className="mt-2 text-sm leading-7 text-stone-700">
-                    {herb.sideEffects}
-                  </p>
-                </div>
-              ) : null}
+    <div className="relative">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-800">
+          Safety Guidance
+        </span>
 
-              {herb.dosageNotes ? (
-                <div className="mt-4">
-                  <h3 className="text-base font-semibold text-stone-900">
-                    Dosage Notes
-                  </h3>
-                  <p className="mt-2 text-sm leading-7 text-stone-700">
-                    {herb.dosageNotes}
-                  </p>
-                </div>
-              ) : null}
-            </section>
-          ) : null}
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-700 shadow-sm">
+          Read with care
+        </span>
+      </div>
+
+      <h2 className="mt-4 text-2xl font-semibold tracking-tight text-stone-900">
+        Safety Notes
+      </h2>
+
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-700 sm:text-base">
+        This section highlights caution-related information to help readers
+        interpret the herb profile more responsibly. It should not replace
+        advice from a qualified healthcare professional.
+      </p>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        {herb.sideEffects ? (
+          <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
+            <h3 className="text-base font-semibold text-stone-900">
+              Side Effects
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-stone-700">
+              {herb.sideEffects}
+            </p>
+          </div>
+        ) : null}
+
+        {herb.dosageNotes ? (
+          <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
+            <h3 className="text-base font-semibold text-stone-900">
+              Dosage Notes
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-stone-700">
+              {herb.dosageNotes}
+            </p>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  </section>
+) : null}
+
+          <HerbSourcesList items={herb.sources} />
 
           <section className="mt-10 rounded-2xl bg-emerald-900 p-6 text-white">
             <h2 className="text-xl font-semibold">Important disclaimer</h2>

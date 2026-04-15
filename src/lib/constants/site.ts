@@ -32,6 +32,10 @@ export const SITE_CONFIG = {
       label: "Safety",
       href: "/safety",
     },
+    {
+      label: "Standards",
+      href: "/editorial-standards",
+    },
   ],
   footerLinks: [
     {
@@ -53,6 +57,10 @@ export const SITE_CONFIG = {
     {
       label: "Safety",
       href: "/safety",
+    },
+    {
+      label: "Standards",
+      href: "/editorial-standards",
     },
   ],
 } as const;
