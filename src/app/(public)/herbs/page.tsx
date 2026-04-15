@@ -125,9 +125,10 @@ export default async function HerbsPage({ searchParams }: HerbsPageProps) {
             />
           ) : (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {herbs.map((herb) => (
+              {herbs.map((herb,index) => (
                 <HerbCard
                   key={herb.id}
+                  priority={index === 0}
                   herb={{
                     id: herb.id,
                     slug: herb.slug,

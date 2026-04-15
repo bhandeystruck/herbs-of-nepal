@@ -19,12 +19,13 @@ type HerbCardProps = {
       slug: string;
     };
   };
+  priority?: boolean;
 };
 
 /**
  * Reusable herb card for listing pages.
  */
-export function HerbCard({ herb }: HerbCardProps) {
+export function HerbCard({ herb, priority=false }: HerbCardProps) {
   const imageUrl = getHerbImageUrl(herb.imagePath);
 
   return (
@@ -37,6 +38,8 @@ export function HerbCard({ herb }: HerbCardProps) {
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
           />
         </div>
       ) : null}
