@@ -136,7 +136,8 @@ export default async function HerbsPage({ searchParams }: HerbsPageProps) {
                     scientificName: herb.scientificName,
                     shortDescription: herb.shortDescription,
                     region: herb.region,
-                    image: herb.image,
+                    imagePath: herb.imagePath,
+                    imageAlt: herb.imageAlt,
                     featured: herb.featured,
                     category: {
                       name: herb.category.name,

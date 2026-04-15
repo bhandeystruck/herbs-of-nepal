@@ -104,7 +104,8 @@ export default async function CategoryDetailPage({
                       scientificName: herb.scientificName,
                       shortDescription: herb.shortDescription,
                       region: herb.region,
-                      image: herb.image,
+                      imagePath: herb.imagePath,
+                      imageAlt: herb.imageAlt,
                       featured: herb.featured,
                       category: {
                         name: category.name,

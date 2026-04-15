@@ -15,12 +15,14 @@ export function SiteFooter() {
           <div className="lg:col-span-5">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-full ">
-                  <Image
+                  <Link href={"/"}>
+                     <Image
                     src="/branding/herbs-of-nepal-logo.svg"
                     alt="Herbs of Nepal logo"
                     height={200}
                     width={200}
-                  />
+                  /></Link>
+               
               </span>
               <div>
                 <h2 className="text-lg font-semibold tracking-tight text-stone-900">
@@ -32,10 +34,16 @@ export function SiteFooter() {
               </div>
             </div>
 
-            <p className="mt-5 max-w-md text-sm leading-7 text-stone-600">
+             <p className="mt-5 max-w-md text-sm leading-7 text-stone-600">
               A modern educational platform exploring Nepalese herbs, their
               traditional uses, cultural significance, and responsible safety
               guidance in a clear and accessible format.
+            </p>
+
+             <p className="mt-4 max-w-md text-xs leading-6 text-stone-500">
+              We aim to present herbal information with sourcing, review context,
+              and clear distinctions between traditional use and evidence-aware
+              interpretation.
             </p>
           </div>
 
@@ -63,17 +71,26 @@ export function SiteFooter() {
             </h3>
 
             <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-              <p className="text-sm leading-7 text-amber-950/90">
+              <p className="text-sm leading-7 text-amber-950/90 mb-2">
                 This platform is for educational purposes only and does not
                 replace professional medical advice, diagnosis, or treatment.
               </p>
 
-              <Link
-                href="/safety"
-                className="mt-4 inline-flex text-sm font-semibold text-amber-900 transition hover:text-amber-700"
-              >
-                Read full safety guidance →
-              </Link>
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/safety"
+                  className="text-sm font-semibold text-amber-900 transition hover:text-amber-700"
+                >
+                  Read safety guidance →
+                </Link>
+
+                <Link
+                  href="/editorial-standards"
+                  className="text-sm font-semibold text-stone-800 transition hover:text-emerald-700"
+                >
+                  Read editorial standards →
+                </Link>
+              </div>
             </div>
           </div>
         </div>

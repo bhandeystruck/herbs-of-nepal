@@ -80,7 +80,20 @@ model Herb {
   sideEffects      String?
   dosageNotes      String?
   region           String?
-  image            String?
+
+  /*
+    Media fields
+    We store the storage path, not raw file binary.
+    Example: herbs/tulsi/primary.jpg
+  */
+  imagePath        String?
+  imageAlt         String?
+  imageSourceName  String?
+  imageSourceUrl   String?
+  imageLicense     String?
+  imagePhotographer String?
+  imageVerifiedAt  DateTime?
+
   featured         Boolean       @default(false)
   isPublished      Boolean       @default(true)
   seoTitle         String?
@@ -88,7 +101,6 @@ model Herb {
 
   /*
     Trust architecture fields.
-    These make herb pages reviewable and evidence-aware.
   */
   evidenceLevel    EvidenceLevel?
   lastReviewedAt   DateTime?
@@ -163,17 +175,27 @@ model HerbSource {
 }
 
 model BlogPost {
-  id               String   @id @default(cuid())
-  title            String
-  slug             String   @unique
-  excerpt          String
-  content          String
-  featuredImageUrl String?
-  isPublished      Boolean  @default(false)
-  seoTitle         String?
-  seoDescription   String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  title              String
+  slug               String   @unique
+  excerpt            String
+  content            String
+
+  /*
+    Media fields for future blog cover images.
+  */
+  featuredImagePath  String?
+  featuredImageAlt   String?
+  imageSourceName    String?
+  imageSourceUrl     String?
+  imageLicense       String?
+  imagePhotographer  String?
+
+  isPublished        Boolean  @default(false)
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@index([slug])
   @@index([isPublished])

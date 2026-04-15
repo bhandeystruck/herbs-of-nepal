@@ -7,6 +7,8 @@ import { HerbTrustPanel } from "@/components/herbs/herb-trust-panel";
 import { getPublishedHerbBySlug } from "@/features/herbs/queries";
 import { SITE_CONFIG } from "@/lib/constants/site";
 import { jsonToStringArray } from "@/lib/utils/json";
+import Image from "next/image";
+import { getHerbImageUrl } from "@/lib/utils/media";
 
 type HerbDetailPageProps = {
   params: Promise<{
@@ -51,6 +53,7 @@ export default async function HerbDetailPage({
   const benefits = jsonToStringArray(herb.benefits);
   const uses = jsonToStringArray(herb.uses);
   const precautions = jsonToStringArray(herb.precautions);
+  const herbImageUrl = getHerbImageUrl(herb.imagePath);
 
   return (
     <main className="py-16 sm:py-24">
@@ -116,6 +119,32 @@ export default async function HerbDetailPage({
             editorialSummary={herb.editorialSummary}
             sourceCount={herb.sources.length}
           />
+
+          {herbImageUrl ? (
+            <section className="mt-10 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+              <div className="relative aspect-[16/9] w-full">
+                <Image
+                  src={herbImageUrl}
+                  alt={herb.imageAlt ?? `${herb.name} herb image`}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+
+              <div className="border-t border-stone-200 bg-stone-50 px-5 py-4">
+                <p className="text-sm font-medium text-stone-800">
+                  Real plant image
+                </p>
+
+                <p className="mt-1 text-xs leading-6 text-stone-600">
+                  {herb.imageSourceName ?? "Source metadata not yet listed"}
+                  {herb.imageLicense ? ` • ${herb.imageLicense}` : ""}
+                </p>
+              </div>
+            </section>
+          ) : null}
 
           <section className="mt-10">
             <h2 className="text-2xl font-semibold text-stone-900">
