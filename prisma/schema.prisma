@@ -6,6 +6,52 @@ datasource db {
   provider = "postgresql"
 }
 
+/*
+  Evidence level shown on herb pages.
+  This helps communicate how strong or limited the support is.
+*/
+enum EvidenceLevel {
+  TRADITIONAL_USE
+  LIMITED_EVIDENCE
+  EMERGING_EVIDENCE
+  MODERATE_EVIDENCE
+  STRONG_EVIDENCE
+  SAFETY_DATA_LIMITED
+}
+
+/*
+  Type of source used to support herb content.
+  This helps distinguish stronger sources from weaker ones.
+*/
+enum SourceType {
+  GOVERNMENT_FACT_SHEET
+  PEER_REVIEWED_REVIEW
+  SYSTEMATIC_REVIEW
+  META_ANALYSIS
+  CLINICAL_TRIAL
+  JOURNAL_ARTICLE
+  UNIVERSITY_ARTICLE
+  ETHNOBOTANICAL_REFERENCE
+  BOOK
+  INSTITUTIONAL_PDF
+  ORGANIZATION_PAGE
+  OTHER
+}
+
+/*
+  Which section of a herb page a source supports.
+  This allows you to attach references to specific content areas later.
+*/
+enum HerbSourceSection {
+  GENERAL
+  OVERVIEW
+  TRADITIONAL_USE
+  SCIENCE
+  SAFETY
+  PREPARATION
+  INTERACTIONS
+}
+
 model Category {
   id          String   @id @default(cuid())
   name        String   @unique
@@ -21,8 +67,8 @@ model Category {
 }
 
 model Herb {
-  id               String   @id @default(cuid())
-  slug             String   @unique
+  id               String        @id @default(cuid())
+  slug             String        @unique
   name             String
   nepaliName       String?
   scientificName   String?
@@ -35,21 +81,85 @@ model Herb {
   dosageNotes      String?
   region           String?
   image            String?
-  featured         Boolean  @default(false)
-  isPublished      Boolean  @default(true)
+  featured         Boolean       @default(false)
+  isPublished      Boolean       @default(true)
   seoTitle         String?
   seoDescription   String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+
+  /*
+    Trust architecture fields.
+    These make herb pages reviewable and evidence-aware.
+  */
+  evidenceLevel    EvidenceLevel?
+  lastReviewedAt   DateTime?
+  reviewedByName   String?
+  reviewedByRole   String?
+  editorialSummary String?
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  sources HerbSource[]
 
   @@index([slug])
   @@index([featured])
   @@index([isPublished])
   @@index([categoryId])
+  @@index([evidenceLevel])
   @@map("herbs")
+}
+
+/*
+  Canonical source registry.
+  One source can be referenced by multiple herbs.
+*/
+model Source {
+  id             String      @id @default(cuid())
+  title          String
+  authors        String?
+  organization   String?
+  publisher      String?
+  year           Int?
+  sourceType     SourceType
+  url            String?
+  pdfUrl         String?
+  citation       String?
+  notes          String?
+  isActive       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  herbs HerbSource[]
+
+  @@index([sourceType])
+  @@index([organization])
+  @@index([year])
+  @@map("sources")
+}
+
+/*
+  Join table between herbs and sources.
+  Lets the same source support multiple herbs and multiple sections.
+*/
+model HerbSource {
+  id           String            @id @default(cuid())
+  herbId       String
+  sourceId     String
+  section      HerbSourceSection @default(GENERAL)
+  displayOrder Int               @default(0)
+  note         String?
+
+  herb   Herb   @relation(fields: [herbId], references: [id], onDelete: Cascade)
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([herbId, sourceId, section])
+  @@index([herbId])
+  @@index([sourceId])
+  @@index([section])
+  @@map("herb_sources")
 }
 
 model BlogPost {
