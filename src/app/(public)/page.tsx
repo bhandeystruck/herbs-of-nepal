@@ -110,9 +110,10 @@ export default async function HomePage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {remainingFeaturedHerbs.map((herb) => (
+            {remainingFeaturedHerbs.map((herb, index) => (
               <HerbCard
                 key={herb.id}
+                priority={index === 0}
                 herb={{
                   id: herb.id,
                   slug: herb.slug,
@@ -128,6 +129,7 @@ export default async function HomePage() {
                     name: herb.category.name,
                     slug: herb.category.slug,
                   },
+                  
                 }}
               />
             ))}

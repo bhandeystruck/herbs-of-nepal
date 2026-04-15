@@ -38,8 +38,9 @@ export function HerbCard({ herb, priority=false }: HerbCardProps) {
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            priority={priority}
             loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : undefined}
+            preload={priority}
           />
         </div>
       ) : null}

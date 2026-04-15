@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
 type HerbFiltersProps = {
   categories: Array<{
@@ -70,18 +71,20 @@ export function HerbFilters({ categories }: HerbFiltersProps) {
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="herb-category"
-            className="mb-2 block text-sm font-medium text-stone-700"
-          >
-            Category
-          </label>
+      <div>
+        <label
+          htmlFor="herb-category"
+          className="mb-2 block text-sm font-medium text-stone-700"
+        >
+          Category
+        </label>
+
+        <div className="relative">
           <select
             id="herb-category"
             value={currentCategory}
             onChange={(event) => updateParam("category", event.target.value)}
-            className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+            className="w-full appearance-none rounded-xl border border-stone-300 bg-white px-4 py-3 pr-12 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
           >
             <option value="">All categories</option>
             {categories.map((category) => (
@@ -90,45 +93,58 @@ export function HerbFilters({ categories }: HerbFiltersProps) {
               </option>
             ))}
           </select>
-        </div>
 
-        <div>
-          <label
-            htmlFor="featured-only"
-            className="mb-2 block text-sm font-medium text-stone-700"
-          >
-            Featured
-          </label>
+          <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="featured-only"
+          className="mb-2 block text-sm font-medium text-stone-700"
+        >
+          Featured
+        </label>
+
+        <div className="relative">
           <select
             id="featured-only"
             value={currentFeatured}
             onChange={(event) => updateParam("featured", event.target.value)}
-            className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+            className="w-full appearance-none rounded-xl border border-stone-300 bg-white px-4 py-3 pr-12 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
           >
             <option value="">All herbs</option>
             <option value="true">Featured only</option>
           </select>
-        </div>
 
-        <div>
-          <label
-            htmlFor="sort-by"
-            className="mb-2 block text-sm font-medium text-stone-700"
-          >
-            Sort by
-          </label>
+          <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="sort-by"
+          className="mb-2 block text-sm font-medium text-stone-700"
+        >
+          Sort by
+        </label>
+
+        <div className="relative">
           <select
             id="sort-by"
             value={currentSort}
             onChange={(event) => updateParam("sort", event.target.value)}
-            className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+            className="w-full appearance-none rounded-xl border border-stone-300 bg-white px-4 py-3 pr-12 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
           >
             <option value="featured">Featured first</option>
             <option value="newest">Newest first</option>
             <option value="name-asc">Name A–Z</option>
             <option value="name-desc">Name Z–A</option>
           </select>
+
+          <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
         </div>
+      </div>
 
         <div className="flex items-end">
           <button
