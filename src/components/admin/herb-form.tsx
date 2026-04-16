@@ -1,6 +1,12 @@
 "use client";
 
+import { useActionState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useFormStatus } from "react-dom";
+import {
+  INITIAL_HERB_FORM_STATE,
+  type HerbFormState,
+} from "@/features/admin/herbs/form-config";
 
 type CategoryOption = {
   id: string;
@@ -50,24 +56,87 @@ type HerbFormValues = {
 
 type HerbFormProps = {
   mode: "create" | "edit";
+  herbId?: string;
   initialValues?: HerbFormValues;
   categories: CategoryOption[];
   evidenceOptions: EvidenceOption[];
+  action: (
+    prevState: HerbFormState,
+    formData: FormData
+  ) => Promise<HerbFormState>;
 };
+
+function HerbFormButtons({ mode }: { mode: "create" | "edit" }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-stone-200 bg-white/95 px-5 py-4 shadow-lg backdrop-blur">
+      <div>
+        <p className="text-sm font-semibold text-stone-900">
+          {mode === "create" ? "Create herb draft" : "Update herb record"}
+        </p>
+        <p className="text-xs leading-6 text-stone-500">
+          {pending
+            ? "Saving changes..."
+            : "Use Save draft to keep the record unpublished."}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          name="intent"
+          value="draft"
+          disabled={pending}
+          className="rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {pending ? "Saving..." : "Save draft"}
+        </button>
+
+        <button
+          type="submit"
+          name="intent"
+          value="save"
+          disabled={pending}
+          className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {pending
+            ? "Saving..."
+            : mode === "create"
+              ? "Create herb"
+              : "Save changes"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Shared herb form UI.
- * This step builds real edit/create structure with proper select fields.
- * Submission logic comes next.
+ * Uses server actions for create/update and useActionState for expected errors.
  */
 export function HerbForm({
   mode,
+  herbId,
   initialValues = {},
   categories,
   evidenceOptions,
+  action,
 }: HerbFormProps) {
+  const [state, formAction] = useActionState(action, INITIAL_HERB_FORM_STATE);
+
+  const fieldError = (name: string) => state.fieldErrors[name];
+
   return (
-    <form className="space-y-8">
+    <form action={formAction} className="space-y-8">
+      {herbId ? <input type="hidden" name="id" value={herbId} /> : null}
+
+      {state.message ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+          {state.message}
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-6">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
@@ -93,6 +162,9 @@ export function HerbForm({
               placeholder="Tulsi"
               className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
             />
+            {fieldError("name") ? (
+              <p className="mt-2 text-xs text-rose-600">{fieldError("name")}</p>
+            ) : null}
           </div>
 
           <div>
@@ -132,6 +204,9 @@ export function HerbForm({
               placeholder="tulsi"
               className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
             />
+            {fieldError("slug") ? (
+              <p className="mt-2 text-xs text-rose-600">{fieldError("slug")}</p>
+            ) : null}
           </div>
 
           <div>
@@ -154,6 +229,9 @@ export function HerbForm({
               </select>
               <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
             </div>
+            {fieldError("categoryId") ? (
+              <p className="mt-2 text-xs text-rose-600">{fieldError("categoryId")}</p>
+            ) : null}
           </div>
 
           <div>
@@ -218,6 +296,9 @@ export function HerbForm({
               rows={3}
               className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm leading-7 text-stone-900 outline-none transition focus:border-emerald-500"
             />
+            {fieldError("shortDescription") ? (
+              <p className="mt-2 text-xs text-rose-600">{fieldError("shortDescription")}</p>
+            ) : null}
           </div>
 
           <div>
@@ -231,6 +312,9 @@ export function HerbForm({
               rows={6}
               className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm leading-7 text-stone-900 outline-none transition focus:border-emerald-500"
             />
+            {fieldError("description") ? (
+              <p className="mt-2 text-xs text-rose-600">{fieldError("description")}</p>
+            ) : null}
           </div>
 
           <div className="grid gap-5 md:grid-cols-2">
@@ -341,6 +425,9 @@ export function HerbForm({
               </select>
               <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
             </div>
+            {fieldError("evidenceLevel") ? (
+              <p className="mt-2 text-xs text-rose-600">{fieldError("evidenceLevel")}</p>
+            ) : null}
           </div>
 
           <div>
@@ -542,32 +629,7 @@ export function HerbForm({
         </div>
       </section>
 
-      <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-stone-200 bg-white/95 px-5 py-4 shadow-lg backdrop-blur">
-        <div>
-          <p className="text-sm font-semibold text-stone-900">
-            {mode === "create" ? "Create herb draft" : "Update herb record"}
-          </p>
-          <p className="text-xs leading-6 text-stone-500">
-            Submission logic will be connected in the next step.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            className="rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
-          >
-            Save draft
-          </button>
-
-          <button
-            type="submit"
-            className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
-          >
-            {mode === "create" ? "Create herb" : "Save changes"}
-          </button>
-        </div>
-      </div>
+      <HerbFormButtons mode={mode} />
     </form>
   );
 }

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HerbForm } from "@/components/admin/herb-form";
+import { updateHerbAction } from "@/features/admin/herbs/actions";
+import { ADMIN_HERB_EVIDENCE_OPTIONS } from "@/features/admin/herbs/form-config";
 import {
   getAdminHerbById,
   getAdminHerbCategories,
@@ -13,15 +15,6 @@ type EditHerbPageProps = {
   }>;
 };
 
-const EVIDENCE_OPTIONS = [
-  { value: "TRADITIONAL_USE", label: "Traditional use documented" },
-  { value: "LIMITED_EVIDENCE", label: "Limited evidence" },
-  { value: "EMERGING_EVIDENCE", label: "Emerging evidence" },
-  { value: "MODERATE_EVIDENCE", label: "Moderate evidence" },
-  { value: "STRONG_EVIDENCE", label: "Strong evidence" },
-  { value: "SAFETY_DATA_LIMITED", label: "Safety data limited" },
-] as const;
-
 function toDateInputValue(value: Date | null | undefined) {
   if (!value) {
     return "";
@@ -31,7 +24,7 @@ function toDateInputValue(value: Date | null | undefined) {
 }
 
 /**
- * Edit herb admin page with real database loading.
+ * Edit herb admin page with real database loading and update action.
  */
 export default async function EditHerbPage({
   params,
@@ -76,8 +69,10 @@ export default async function EditHerbPage({
 
       <HerbForm
         mode="edit"
+        herbId={herb.id}
         categories={categories}
-        evidenceOptions={[...EVIDENCE_OPTIONS]}
+        evidenceOptions={[...ADMIN_HERB_EVIDENCE_OPTIONS]}
+        action={updateHerbAction}
         initialValues={{
           name: herb.name,
           nepaliName: herb.nepaliName ?? "",

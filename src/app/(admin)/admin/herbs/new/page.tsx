@@ -1,19 +1,11 @@
 import Link from "next/link";
 import { HerbForm } from "@/components/admin/herb-form";
+import { createHerbAction } from "@/features/admin/herbs/actions";
+import { ADMIN_HERB_EVIDENCE_OPTIONS } from "@/features/admin/herbs/form-config";
 import { getAdminHerbCategories } from "@/features/admin/herbs/queries";
 
-const EVIDENCE_OPTIONS = [
-  { value: "TRADITIONAL_USE", label: "Traditional use documented" },
-  { value: "LIMITED_EVIDENCE", label: "Limited evidence" },
-  { value: "EMERGING_EVIDENCE", label: "Emerging evidence" },
-  { value: "MODERATE_EVIDENCE", label: "Moderate evidence" },
-  { value: "STRONG_EVIDENCE", label: "Strong evidence" },
-  { value: "SAFETY_DATA_LIMITED", label: "Safety data limited" },
-] as const;
-
 /**
- * New herb admin page.
- * Form structure only for now.
+ * New herb admin page with real create action.
  */
 export default async function NewHerbPage() {
   const categories = await getAdminHerbCategories();
@@ -49,7 +41,8 @@ export default async function NewHerbPage() {
       <HerbForm
         mode="create"
         categories={categories}
-        evidenceOptions={[...EVIDENCE_OPTIONS]}
+        evidenceOptions={[...ADMIN_HERB_EVIDENCE_OPTIONS]}
+        action={createHerbAction}
       />
     </div>
   );
