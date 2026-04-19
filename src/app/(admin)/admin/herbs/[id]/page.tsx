@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HerbForm } from "@/components/admin/herb-form";
+import { HerbSourceLinkManager } from "@/components/admin/herb-source-link-manager";
 import { updateHerbAction } from "@/features/admin/herbs/actions";
 import { ADMIN_HERB_EVIDENCE_OPTIONS } from "@/features/admin/herbs/form-config";
 import {
   getAdminHerbById,
   getAdminHerbCategories,
 } from "@/features/admin/herbs/queries";
+import { getAdminSources } from "@/features/admin/sources/queries";
 import { jsonToStringArray } from "@/lib/utils/json";
 
 type EditHerbPageProps = {
@@ -24,21 +26,29 @@ function toDateInputValue(value: Date | null | undefined) {
 }
 
 /**
- * Edit herb admin page with real database loading and update action.
+ * Edit herb admin page with real database loading and source-linking UI.
  */
 export default async function EditHerbPage({
   params,
 }: EditHerbPageProps) {
   const { id } = await params;
 
-  const [herb, categories] = await Promise.all([
+  const [herb, categories, sources] = await Promise.all([
     getAdminHerbById(id),
     getAdminHerbCategories(),
+    getAdminSources(),
   ]);
 
   if (!herb) {
     notFound();
   }
+
+  const sourceOptions = sources.map((source) => ({
+    id: source.id,
+    title: source.title,
+    sourceType: source.sourceType,
+    organization: source.organization,
+  }));
 
   return (
     <div className="space-y-8">
@@ -61,7 +71,8 @@ export default async function EditHerbPage({
             </h2>
 
             <p className="mt-4 text-sm leading-7 text-stone-600 sm:text-base">
-              Update the herb profile, trust metadata, media details, and SEO configuration.
+              Update the herb profile, trust metadata, media details, source links,
+              and SEO configuration.
             </p>
           </div>
         </div>
@@ -108,6 +119,25 @@ export default async function EditHerbPage({
           seoTitle: herb.seoTitle ?? "",
           seoDescription: herb.seoDescription ?? "",
         }}
+      />
+
+      <HerbSourceLinkManager
+        herbId={herb.id}
+        sourceOptions={sourceOptions}
+        linkedSources={herb.sources.map((item) => ({
+          id: item.id,
+          section: item.section,
+          displayOrder: item.displayOrder,
+          note: item.note,
+          source: {
+            id: item.source.id,
+            title: item.source.title,
+            sourceType: item.source.sourceType,
+            organization: item.source.organization,
+            url: item.source.url,
+            pdfUrl: item.source.pdfUrl,
+          },
+        }))}
       />
     </div>
   );
