@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/container";
 import { getPublishedBlogPostBySlug } from "@/features/blog/queries";
 import { SITE_CONFIG } from "@/lib/constants/site";
+import { MarkdownContent } from "@/components/blog/markdown-content";
 
 type BlogDetailPageProps = {
   params: Promise<{
@@ -92,9 +93,7 @@ export default async function BlogDetailPage({
       <Container className="pt-12 sm:pt-16">
         <article className="mx-auto max-w-4xl">
           <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm sm:p-10">
-            <div className="prose prose-stone max-w-none prose-headings:tracking-tight prose-a:text-emerald-700">
-              <p>{post.content}</p>
-            </div>
+            <MarkdownContent content={post.content} />
           </section>
 
           <section className="mt-10 rounded-3xl bg-stone-100 p-8 sm:p-10">
