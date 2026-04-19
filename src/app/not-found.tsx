@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Leaf } from "lucide-react";
+import Image from "next/image";
 import { Container } from "@/components/layout/container";
+import { SITE_CONFIG } from "@/lib/constants/site";
 
 /**
  * Global not-found page.
@@ -11,9 +12,25 @@ export default function NotFoundPage() {
     <main className="py-20 sm:py-28">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <Leaf className="h-7 w-7 text-emerald-700" />
+          <Link href="/" className="flex shrink-0 items-center text-start gap-3">
+          <span className="flex h-10 w-10 items-start justify-center rounded-full">
+            <Image
+            src="/branding/herbs-of-nepal-logo.svg"
+            alt="Herbs of Nepal logo"
+            height={200}
+            width={200}
+            />
+          </span>
+
+          <div className="flex flex-col">
+            <span className="text-md font-semibold tracking-normal text-stone-900 sm:text-base">
+              {SITE_CONFIG.name}
+            </span>
+            <span className="text-sm text-stone-500 sm:block">
+              Nepalese herbal knowledge base.
+            </span>
           </div>
+        </Link>
 
           <p className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
             Page Not Found
