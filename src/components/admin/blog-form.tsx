@@ -2,7 +2,9 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
+import Image from "next/image";
 import { MarkdownContent } from "@/components/blog/markdown-content";
+import { getBlogImageUrl } from "@/lib/utils/media";
 import {
   INITIAL_BLOG_FORM_STATE,
   type BlogFormState,
@@ -80,7 +82,7 @@ function BlogFormButtons({ mode }: { mode: "create" | "edit" }) {
 }
 
 /**
- * Shared blog form UI with write/preview support for markdown content.
+ * Shared blog form UI with markdown write/preview support and featured image preview.
  */
 export function BlogForm({
   mode,
@@ -91,12 +93,22 @@ export function BlogForm({
   const [state, formAction] = useActionState(action, INITIAL_BLOG_FORM_STATE);
   const [contentMode, setContentMode] = useState<"write" | "preview">("write");
   const [contentDraft, setContentDraft] = useState(initialValues.content ?? "");
+  const [featuredImagePathDraft, setFeaturedImagePathDraft] = useState(
+    initialValues.featuredImagePath ?? ""
+  );
+  const [featuredImageAltDraft, setFeaturedImageAltDraft] = useState(
+    initialValues.featuredImageAlt ?? ""
+  );
 
   const fieldError = (name: string) => state.fieldErrors[name];
 
   const previewContent = useMemo(() => {
     return contentDraft.trim() || "## Preview\n\nStart writing markdown to preview your article here.";
   }, [contentDraft]);
+
+  const featuredImageUrl = useMemo(() => {
+    return getBlogImageUrl(featuredImagePathDraft);
+  }, [featuredImagePathDraft]);
 
   return (
     <form action={formAction} className="space-y-8">
@@ -267,81 +279,144 @@ export function BlogForm({
           <h3 className="mt-2 text-xl font-semibold text-stone-900">
             Featured image and attribution
           </h3>
+          <p className="mt-2 text-sm leading-7 text-stone-600">
+            Use a Supabase storage path for the featured image. Example:
+            <span className="ml-1 rounded bg-stone-100 px-2 py-1 font-mono text-xs text-stone-700">
+              blog/understanding-lapsi-in-nepalese-food-and-herbal-tradition/featured.jpg
+            </span>
+          </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <label htmlFor="featuredImagePath" className="mb-2 block text-sm font-medium text-stone-700">
-              Featured image path
-            </label>
-            <input
-              id="featuredImagePath"
-              name="featuredImagePath"
-              defaultValue={initialValues.featuredImagePath ?? ""}
-              placeholder="blog/understanding-tulsi-in-nepalese-households/featured.jpg"
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-5">
+            <div>
+              <label htmlFor="featuredImagePath" className="mb-2 block text-sm font-medium text-stone-700">
+                Featured image path
+              </label>
+              <input
+                id="featuredImagePath"
+                name="featuredImagePath"
+                value={featuredImagePathDraft}
+                onChange={(event) => setFeaturedImagePathDraft(event.target.value)}
+                placeholder="blog/understanding-tulsi-in-nepalese-households/featured.jpg"
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="featuredImageAlt" className="mb-2 block text-sm font-medium text-stone-700">
+                Featured image alt text
+              </label>
+              <input
+                id="featuredImageAlt"
+                name="featuredImageAlt"
+                value={featuredImageAltDraft}
+                onChange={(event) => setFeaturedImageAltDraft(event.target.value)}
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="imageSourceName" className="mb-2 block text-sm font-medium text-stone-700">
+                Image source name
+              </label>
+              <input
+                id="imageSourceName"
+                name="imageSourceName"
+                defaultValue={initialValues.imageSourceName ?? ""}
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="imageSourceUrl" className="mb-2 block text-sm font-medium text-stone-700">
+                Image source URL
+              </label>
+              <input
+                id="imageSourceUrl"
+                name="imageSourceUrl"
+                defaultValue={initialValues.imageSourceUrl ?? ""}
+                placeholder="https://..."
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <label htmlFor="imageLicense" className="mb-2 block text-sm font-medium text-stone-700">
+                  Image license
+                </label>
+                <input
+                  id="imageLicense"
+                  name="imageLicense"
+                  defaultValue={initialValues.imageLicense ?? ""}
+                  className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="imagePhotographer" className="mb-2 block text-sm font-medium text-stone-700">
+                  Photographer / creator
+                </label>
+                <input
+                  id="imagePhotographer"
+                  name="imagePhotographer"
+                  defaultValue={initialValues.imagePhotographer ?? ""}
+                  className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+                />
+              </div>
+            </div>
           </div>
 
           <div>
-            <label htmlFor="featuredImageAlt" className="mb-2 block text-sm font-medium text-stone-700">
-              Featured image alt text
-            </label>
-            <input
-              id="featuredImageAlt"
-              name="featuredImageAlt"
-              defaultValue={initialValues.featuredImageAlt ?? ""}
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
+            <p className="mb-2 block text-sm font-medium text-stone-700">
+              Featured image preview
+            </p>
 
-          <div>
-            <label htmlFor="imageSourceName" className="mb-2 block text-sm font-medium text-stone-700">
-              Image source name
-            </label>
-            <input
-              id="imageSourceName"
-              name="imageSourceName"
-              defaultValue={initialValues.imageSourceName ?? ""}
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
+            <div className="overflow-hidden rounded-3xl border border-stone-200 bg-stone-50">
+              {featuredImageUrl ? (
+                <>
+                  <div className="relative aspect-[16/10] w-full overflow-hidden">
+                    <Image
+                      src={featuredImageUrl}
+                      alt={featuredImageAltDraft || "Featured blog image preview"}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
 
-          <div>
-            <label htmlFor="imageSourceUrl" className="mb-2 block text-sm font-medium text-stone-700">
-              Image source URL
-            </label>
-            <input
-              id="imageSourceUrl"
-              name="imageSourceUrl"
-              defaultValue={initialValues.imageSourceUrl ?? ""}
-              placeholder="https://..."
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
+                  <div className="border-t border-stone-200 bg-white px-5 py-4">
+                    <p className="text-sm font-medium text-stone-800">
+                      Live image preview
+                    </p>
+                    <p className="mt-1 text-xs leading-6 text-stone-500">
+                      This preview uses the current Supabase image path entered above.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="flex aspect-[16/10] items-center justify-center px-6 text-center">
+                  <div>
+                    <p className="text-sm font-medium text-stone-700">
+                      No image preview yet
+                    </p>
+                    <p className="mt-2 text-xs leading-6 text-stone-500">
+                      Add a valid featured image path to preview the blog image here.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          <div>
-            <label htmlFor="imageLicense" className="mb-2 block text-sm font-medium text-stone-700">
-              Image license
-            </label>
-            <input
-              id="imageLicense"
-              name="imageLicense"
-              defaultValue={initialValues.imageLicense ?? ""}
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="imagePhotographer" className="mb-2 block text-sm font-medium text-stone-700">
-              Photographer / creator
-            </label>
-            <input
-              id="imagePhotographer"
-              name="imagePhotographer"
-              defaultValue={initialValues.imagePhotographer ?? ""}
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
+            <div className="mt-4 rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm leading-7 text-stone-600">
+              <p className="font-semibold text-stone-900">Recommended guidance</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>Use a wide editorial image for best results.</li>
+                <li>Always add meaningful alt text.</li>
+                <li>Fill source and license fields when using external images.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

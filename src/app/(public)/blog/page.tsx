@@ -64,6 +64,8 @@ export default async function BlogPage() {
                     slug: post.slug,
                     excerpt: post.excerpt,
                     createdAt: post.createdAt,
+                    featuredImagePath: post.featuredImagePath,
+                    featuredImageAlt: post.featuredImageAlt,
                   }}
                 />
               ))}

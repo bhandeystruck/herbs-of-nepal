@@ -8,6 +8,9 @@ type EditBlogPageProps = {
   params: Promise<{
     id: string;
   }>;
+  searchParams: Promise<{
+    saved?: string;
+  }>;
 };
 
 /**
@@ -15,8 +18,11 @@ type EditBlogPageProps = {
  */
 export default async function EditBlogPage({
   params,
+  searchParams,
 }: EditBlogPageProps) {
   const { id } = await params;
+  const { saved } = await searchParams;
+
   const post = await getAdminBlogPostById(id);
 
   if (!post) {
@@ -25,6 +31,12 @@ export default async function EditBlogPage({
 
   return (
     <div className="space-y-8">
+      {saved === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Blog post updates have been saved successfully.
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="max-w-3xl">
           <Link

@@ -1,29 +1,14 @@
 import { db } from "@/lib/prisma/client";
 
 /**
- * Fetches all published blog posts for the public site.
+ * Fetches all published blog posts for the public blog listing page.
  */
 export async function getPublishedBlogPosts() {
   return db.blogPost.findMany({
     where: {
       isPublished: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-}
-
-/**
- * Fetches a single published blog post by slug.
- * Used later for the blog detail page.
- */
-export async function getPublishedBlogPostBySlug(slug: string) {
-  return db.blogPost.findFirst({
-    where: {
-      slug,
-      isPublished: true,
-    },
+    orderBy: [{ createdAt: "desc" }],
   });
 }
 
@@ -35,9 +20,19 @@ export async function getLatestPublishedBlogPosts(limit = 3) {
     where: {
       isPublished: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: [{ createdAt: "desc" }],
     take: limit,
+  });
+}
+
+/**
+ * Fetches a single published blog post by slug.
+ */
+export async function getPublishedBlogPostBySlug(slug: string) {
+  return db.blogPost.findFirst({
+    where: {
+      slug,
+      isPublished: true,
+    },
   });
 }

@@ -131,7 +131,7 @@ export async function createBlogPostAction(
     };
   }
 
-  redirect("/admin/blog");
+  redirect("/admin/blog?saved=1&created=1");
 }
 
 export async function updateBlogPostAction(
@@ -159,5 +159,5 @@ export async function updateBlogPostAction(
     };
   }
 
-  redirect(`/admin/blog/${blogId}`);
+  redirect(`/admin/blog/${blogId}?saved=1`);
 }
