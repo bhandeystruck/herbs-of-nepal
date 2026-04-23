@@ -1,10 +1,42 @@
 import { db } from "@/lib/prisma/client";
 
+export type AdminCategoryFilters = {
+  query?: string;
+};
+
 /**
  * Fetches all categories for the admin category library.
  */
-export async function getAdminCategories() {
+export async function getAdminCategories(filters: AdminCategoryFilters = {}) {
+  const query = filters.query?.trim();
+
   return db.category.findMany({
+    where: {
+      ...(query
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                slug: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                description: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          }
+        : {}),
+    },
     include: {
       _count: {
         select: {

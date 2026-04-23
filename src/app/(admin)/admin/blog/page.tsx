@@ -1,13 +1,28 @@
 import Link from "next/link";
+import { AdminListFilters } from "@/components/admin/admin-list-filters";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { getAdminBlogPosts } from "@/features/admin/blog/queries";
 
+type AdminBlogPageProps = {
+  searchParams: Promise<{
+    q?: string;
+    status?: "all" | "published" | "draft";
+  }>;
+};
+
 /**
- * Admin blog list page.
+ * Admin blog list page with search and status filters.
  */
-export default async function AdminBlogPage() {
-  const posts = await getAdminBlogPosts();
+export default async function AdminBlogPage({
+  searchParams,
+}: AdminBlogPageProps) {
+  const params = await searchParams;
+
+  const posts = await getAdminBlogPosts({
+    query: params.q,
+    status: params.status ?? "all",
+  });
 
   return (
     <div className="space-y-8">
@@ -19,23 +34,32 @@ export default async function AdminBlogPage() {
         actionHref="/admin/blog/new"
       />
 
+      <AdminListFilters
+        searchPlaceholder="Search by title, slug, excerpt, or content"
+        statusOptions={[
+          { value: "all", label: "All statuses" },
+          { value: "published", label: "Published" },
+          { value: "draft", label: "Draft" },
+        ]}
+      />
+
       <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 px-6 py-5">
           <h3 className="text-lg font-semibold tracking-tight text-stone-900">
             Blog library
           </h3>
           <p className="mt-1 text-sm text-stone-600">
-            {posts.length} {posts.length === 1 ? "record" : "records"} in admin
+            {posts.length} {posts.length === 1 ? "record" : "records"} found
           </p>
         </div>
 
         {posts.length === 0 ? (
           <div className="px-6 py-10 text-center">
             <h4 className="text-lg font-semibold text-stone-900">
-              No blog posts found
+              No blog posts matched your filters
             </h4>
             <p className="mt-2 text-sm leading-7 text-stone-600">
-              Create your first post to expand the public knowledge base.
+              Try adjusting your search or filters, or create a new post.
             </p>
             <div className="mt-6">
               <Link

@@ -1,8 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import Image from "next/image";
 import { useFormStatus } from "react-dom";
+import { getHerbImageUrl } from "@/lib/utils/media";
 import {
   INITIAL_HERB_FORM_STATE,
   type HerbFormState,
@@ -112,8 +114,7 @@ function HerbFormButtons({ mode }: { mode: "create" | "edit" }) {
 }
 
 /**
- * Shared herb form UI.
- * Uses server actions for create/update and useActionState for expected errors.
+ * Shared herb form UI with image preview and guidance.
  */
 export function HerbForm({
   mode,
@@ -124,8 +125,14 @@ export function HerbForm({
   action,
 }: HerbFormProps) {
   const [state, formAction] = useActionState(action, INITIAL_HERB_FORM_STATE);
+  const [imagePathDraft, setImagePathDraft] = useState(initialValues.imagePath ?? "");
+  const [imageAltDraft, setImageAltDraft] = useState(initialValues.imageAlt ?? "");
 
   const fieldError = (name: string) => state.fieldErrors[name];
+
+  const herbImageUrl = useMemo(() => {
+    return getHerbImageUrl(imagePathDraft);
+  }, [imagePathDraft]);
 
   return (
     <form action={formAction} className="space-y-8">
@@ -493,100 +500,161 @@ export function HerbForm({
             Herb image and attribution
           </h3>
           <p className="mt-2 text-sm leading-7 text-stone-600">
-            This section prepares the record for real herb media and trust-aware attribution.
+            Use a Supabase storage path for the herb image. Example:
+            <span className="ml-1 rounded bg-stone-100 px-2 py-1 font-mono text-xs text-stone-700">
+              herbs/tulsi/primary.jpg
+            </span>
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <label htmlFor="imagePath" className="mb-2 block text-sm font-medium text-stone-700">
-              Image path
-            </label>
-            <input
-              id="imagePath"
-              name="imagePath"
-              defaultValue={initialValues.imagePath ?? ""}
-              placeholder="herbs/tulsi/primary.jpg"
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-5">
+            <div>
+              <label htmlFor="imagePath" className="mb-2 block text-sm font-medium text-stone-700">
+                Image path
+              </label>
+              <input
+                id="imagePath"
+                name="imagePath"
+                value={imagePathDraft}
+                onChange={(event) => setImagePathDraft(event.target.value)}
+                placeholder="herbs/tulsi/primary.jpg"
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="imageAlt" className="mb-2 block text-sm font-medium text-stone-700">
+                Image alt text
+              </label>
+              <input
+                id="imageAlt"
+                name="imageAlt"
+                value={imageAltDraft}
+                onChange={(event) => setImageAltDraft(event.target.value)}
+                placeholder="Tulsi plant used in Nepalese herbal traditions"
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="imageSourceName" className="mb-2 block text-sm font-medium text-stone-700">
+                Image source name
+              </label>
+              <input
+                id="imageSourceName"
+                name="imageSourceName"
+                defaultValue={initialValues.imageSourceName ?? ""}
+                placeholder="Verified botanical image source"
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="imageSourceUrl" className="mb-2 block text-sm font-medium text-stone-700">
+                Image source URL
+              </label>
+              <input
+                id="imageSourceUrl"
+                name="imageSourceUrl"
+                defaultValue={initialValues.imageSourceUrl ?? ""}
+                placeholder="https://..."
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <label htmlFor="imageLicense" className="mb-2 block text-sm font-medium text-stone-700">
+                  Image license
+                </label>
+                <input
+                  id="imageLicense"
+                  name="imageLicense"
+                  defaultValue={initialValues.imageLicense ?? ""}
+                  placeholder="Usage verified by project owner"
+                  className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="imagePhotographer" className="mb-2 block text-sm font-medium text-stone-700">
+                  Photographer / creator
+                </label>
+                <input
+                  id="imagePhotographer"
+                  name="imagePhotographer"
+                  defaultValue={initialValues.imagePhotographer ?? ""}
+                  placeholder="Optional"
+                  className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="imageVerifiedAt" className="mb-2 block text-sm font-medium text-stone-700">
+                Image verified date
+              </label>
+              <input
+                id="imageVerifiedAt"
+                name="imageVerifiedAt"
+                type="date"
+                defaultValue={initialValues.imageVerifiedAt ?? ""}
+                className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
+              />
+            </div>
           </div>
 
           <div>
-            <label htmlFor="imageAlt" className="mb-2 block text-sm font-medium text-stone-700">
-              Image alt text
-            </label>
-            <input
-              id="imageAlt"
-              name="imageAlt"
-              defaultValue={initialValues.imageAlt ?? ""}
-              placeholder="Tulsi plant used in Nepalese herbal traditions"
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
+            <p className="mb-2 block text-sm font-medium text-stone-700">
+              Herb image preview
+            </p>
 
-          <div>
-            <label htmlFor="imageSourceName" className="mb-2 block text-sm font-medium text-stone-700">
-              Image source name
-            </label>
-            <input
-              id="imageSourceName"
-              name="imageSourceName"
-              defaultValue={initialValues.imageSourceName ?? ""}
-              placeholder="Verified botanical image source"
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
+            <div className="overflow-hidden rounded-3xl border border-stone-200 bg-stone-50">
+              {herbImageUrl ? (
+                <>
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <Image
+                      src={herbImageUrl}
+                      alt={imageAltDraft || "Herb image preview"}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
 
-          <div>
-            <label htmlFor="imageSourceUrl" className="mb-2 block text-sm font-medium text-stone-700">
-              Image source URL
-            </label>
-            <input
-              id="imageSourceUrl"
-              name="imageSourceUrl"
-              defaultValue={initialValues.imageSourceUrl ?? ""}
-              placeholder="https://..."
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
+                  <div className="border-t border-stone-200 bg-white px-5 py-4">
+                    <p className="text-sm font-medium text-stone-800">
+                      Live image preview
+                    </p>
+                    <p className="mt-1 text-xs leading-6 text-stone-500">
+                      This preview uses the current Supabase image path entered above.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="flex aspect-[4/3] items-center justify-center px-6 text-center">
+                  <div>
+                    <p className="text-sm font-medium text-stone-700">
+                      No image preview yet
+                    </p>
+                    <p className="mt-2 text-xs leading-6 text-stone-500">
+                      Add a valid herb image path to preview the image here.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          <div>
-            <label htmlFor="imageLicense" className="mb-2 block text-sm font-medium text-stone-700">
-              Image license
-            </label>
-            <input
-              id="imageLicense"
-              name="imageLicense"
-              defaultValue={initialValues.imageLicense ?? ""}
-              placeholder="Usage verified by project owner"
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="imagePhotographer" className="mb-2 block text-sm font-medium text-stone-700">
-              Photographer / creator
-            </label>
-            <input
-              id="imagePhotographer"
-              name="imagePhotographer"
-              defaultValue={initialValues.imagePhotographer ?? ""}
-              placeholder="Optional"
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="imageVerifiedAt" className="mb-2 block text-sm font-medium text-stone-700">
-              Image verified date
-            </label>
-            <input
-              id="imageVerifiedAt"
-              name="imageVerifiedAt"
-              type="date"
-              defaultValue={initialValues.imageVerifiedAt ?? ""}
-              className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500"
-            />
+            <div className="mt-4 rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm leading-7 text-stone-600">
+              <p className="font-semibold text-stone-900">Recommended guidance</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>Use a clear real plant image for identification and trust.</li>
+                <li>Always add meaningful alt text.</li>
+                <li>Fill source and license fields when using external images.</li>
+                <li>Use imageVerifiedAt when the image source has been checked.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

@@ -1,14 +1,42 @@
 import Link from "next/link";
+import { EvidenceLevel } from "@prisma/client";
+import { AdminListFilters } from "@/components/admin/admin-list-filters";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { getAdminHerbs } from "@/features/admin/herbs/queries";
+import {
+  getAdminHerbCategories,
+  getAdminHerbs,
+} from "@/features/admin/herbs/queries";
 import { getEvidenceLevelLabel } from "@/lib/utils/trust";
 
+type AdminHerbsPageProps = {
+  searchParams: Promise<{
+    q?: string;
+    categoryId?: string;
+    status?: "all" | "published" | "draft";
+    featured?: "all" | "featured" | "not-featured";
+    evidenceLevel?: "all" | EvidenceLevel;
+  }>;
+};
+
 /**
- * Admin herbs list page.
+ * Admin herbs list page with search and filters.
  */
-export default async function AdminHerbsPage() {
-  const herbs = await getAdminHerbs();
+export default async function AdminHerbsPage({
+  searchParams,
+}: AdminHerbsPageProps) {
+  const params = await searchParams;
+
+  const [herbs, categories] = await Promise.all([
+    getAdminHerbs({
+      query: params.q,
+      categoryId: params.categoryId,
+      status: params.status ?? "all",
+      featured: params.featured ?? "all",
+      evidenceLevel: params.evidenceLevel ?? "all",
+    }),
+    getAdminHerbCategories(),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -20,6 +48,35 @@ export default async function AdminHerbsPage() {
         actionHref="/admin/herbs/new"
       />
 
+      <AdminListFilters
+        searchPlaceholder="Search by herb name, Nepali name, scientific name, or slug"
+        categoryOptions={categories.map((category) => ({
+          value: category.id,
+          label: category.name,
+        }))}
+        statusOptions={[
+          { value: "all", label: "All statuses" },
+          { value: "published", label: "Published" },
+          { value: "draft", label: "Draft" },
+        ]}
+        featuredOptions={[
+          { value: "all", label: "All herbs" },
+          { value: "featured", label: "Featured only" },
+          { value: "not-featured", label: "Not featured" },
+        ]}
+        extraLabel="Evidence"
+        extraParamKey="evidenceLevel"
+        extraOptions={[
+          { value: "all", label: "All evidence levels" },
+          { value: "TRADITIONAL_USE", label: "Traditional use documented" },
+          { value: "LIMITED_EVIDENCE", label: "Limited evidence" },
+          { value: "EMERGING_EVIDENCE", label: "Emerging evidence" },
+          { value: "MODERATE_EVIDENCE", label: "Moderate evidence" },
+          { value: "STRONG_EVIDENCE", label: "Strong evidence" },
+          { value: "SAFETY_DATA_LIMITED", label: "Safety data limited" },
+        ]}
+      />
+
       <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 px-6 py-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -28,7 +85,7 @@ export default async function AdminHerbsPage() {
                 Herb library
               </h3>
               <p className="mt-1 text-sm text-stone-600">
-                {herbs.length} {herbs.length === 1 ? "record" : "records"} in admin
+                {herbs.length} {herbs.length === 1 ? "record" : "records"} found
               </p>
             </div>
           </div>
@@ -37,10 +94,10 @@ export default async function AdminHerbsPage() {
         {herbs.length === 0 ? (
           <div className="px-6 py-10 text-center">
             <h4 className="text-lg font-semibold text-stone-900">
-              No herbs found
+              No herbs matched your filters
             </h4>
             <p className="mt-2 text-sm leading-7 text-stone-600">
-              Create your first herb record to start building the knowledge base.
+              Try adjusting your search or filters, or create a new herb record.
             </p>
             <div className="mt-6">
               <Link

@@ -1,12 +1,25 @@
 import Link from "next/link";
+import { AdminListFilters } from "@/components/admin/admin-list-filters";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { getAdminCategories } from "@/features/admin/categories/queries";
 
+type AdminCategoriesPageProps = {
+  searchParams: Promise<{
+    q?: string;
+  }>;
+};
+
 /**
- * Admin categories list page.
+ * Admin categories list page with search support.
  */
-export default async function AdminCategoriesPage() {
-  const categories = await getAdminCategories();
+export default async function AdminCategoriesPage({
+  searchParams,
+}: AdminCategoriesPageProps) {
+  const params = await searchParams;
+
+  const categories = await getAdminCategories({
+    query: params.q,
+  });
 
   return (
     <div className="space-y-8">
@@ -18,23 +31,25 @@ export default async function AdminCategoriesPage() {
         actionHref="/admin/categories/new"
       />
 
+      <AdminListFilters searchPlaceholder="Search by category name, slug, or description" />
+
       <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 px-6 py-5">
           <h3 className="text-lg font-semibold tracking-tight text-stone-900">
             Category library
           </h3>
           <p className="mt-1 text-sm text-stone-600">
-            {categories.length} {categories.length === 1 ? "record" : "records"} in admin
+            {categories.length} {categories.length === 1 ? "record" : "records"} found
           </p>
         </div>
 
         {categories.length === 0 ? (
           <div className="px-6 py-10 text-center">
             <h4 className="text-lg font-semibold text-stone-900">
-              No categories found
+              No categories matched your search
             </h4>
             <p className="mt-2 text-sm leading-7 text-stone-600">
-              Create your first category to organize herbs on the public site.
+              Try another search term, or create a new category.
             </p>
             <div className="mt-6">
               <Link
