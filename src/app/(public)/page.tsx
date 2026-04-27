@@ -200,6 +200,8 @@ export default async function HomePage() {
                   slug: post.slug,
                   excerpt: post.excerpt,
                   createdAt: post.createdAt,
+                  featuredImagePath: post.featuredImagePath,
+                  featuredImageAlt: post.featuredImageAlt,
                 }}
               />
             ))}

@@ -3,12 +3,29 @@ import { SourceForm } from "@/components/admin/source-form";
 import { createSourceAction } from "@/features/admin/sources/actions";
 import { ADMIN_SOURCE_TYPE_OPTIONS } from "@/features/admin/sources/form-config";
 
+type NewSourcePageProps = {
+  searchParams: Promise<{
+    saved?: string;
+    created?: string;
+  }>;
+};
+
 /**
  * New source admin page.
  */
-export default function NewSourcePage() {
+export default async function NewSourcePage({
+  searchParams,
+}: NewSourcePageProps) {
+  const { saved, created } = await searchParams;
+
   return (
     <div className="space-y-8">
+      {saved === "1" && created === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Source record has been created successfully.
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="max-w-3xl">
           <Link

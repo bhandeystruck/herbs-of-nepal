@@ -10,10 +10,14 @@ import {
 } from "@/features/admin/herbs/queries";
 import { getAdminSources } from "@/features/admin/sources/queries";
 import { jsonToStringArray } from "@/lib/utils/json";
+import { DeleteHerbButton } from "@/components/admin/delete-herb-button";
 
 type EditHerbPageProps = {
   params: Promise<{
     id: string;
+  }>;
+  searchParams: Promise<{
+    saved?: string;
   }>;
 };
 
@@ -30,8 +34,10 @@ function toDateInputValue(value: Date | null | undefined) {
  */
 export default async function EditHerbPage({
   params,
+  searchParams,
 }: EditHerbPageProps) {
   const { id } = await params;
+  const { saved } = await searchParams;
 
   const [herb, categories, sources] = await Promise.all([
     getAdminHerbById(id),
@@ -52,6 +58,12 @@ export default async function EditHerbPage({
 
   return (
     <div className="space-y-8">
+      {saved === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Herb record updates have been saved successfully.
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">
@@ -74,6 +86,9 @@ export default async function EditHerbPage({
               Update the herb profile, trust metadata, media details, source links,
               and SEO configuration.
             </p>
+          </div>
+          <div className="flex shrink-0">
+            <DeleteHerbButton herbId={herb.id} herbName={herb.name} />
           </div>
         </div>
       </section>
