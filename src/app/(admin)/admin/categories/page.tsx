@@ -6,6 +6,7 @@ import { getAdminCategories } from "@/features/admin/categories/queries";
 type AdminCategoriesPageProps = {
   searchParams: Promise<{
     q?: string;
+    deleted?: string;
   }>;
 };
 
@@ -23,6 +24,11 @@ export default async function AdminCategoriesPage({
 
   return (
     <div className="space-y-8">
+      {params.deleted === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Category has been deleted successfully.
+        </section>
+      ) : null}
       <AdminPageHeader
         eyebrow="Categories"
         title="Manage category records"

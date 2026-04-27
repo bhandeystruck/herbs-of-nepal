@@ -132,7 +132,7 @@ export async function createSourceAction(
     };
   }
 
-  redirect("/admin/sources");
+  redirect("/admin/sources/new?saved=1&created=1");
 }
 
 export async function updateSourceAction(
@@ -160,5 +160,38 @@ export async function updateSourceAction(
     };
   }
 
-  redirect(`/admin/sources/${sourceId}`);
+  redirect(`/admin/sources/${sourceId}?saved=1`);
+}
+
+export async function deleteSourceAction(formData: FormData) {
+  const sourceId = getString(formData, "id");
+
+  if (!sourceId) {
+    redirect("/admin/sources?error=missing-id");
+  }
+
+  const source = await db.source.findUnique({
+    where: { id: sourceId },
+  });
+
+  if (!source) {
+    redirect("/admin/sources?error=not-found");
+  }
+
+  await db.herbSource.deleteMany({
+    where: {
+      sourceId: source.id,
+    },
+  });
+
+  await db.source.delete({
+    where: { id: source.id },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/sources");
+  revalidatePath(`/admin/sources/${source.id}`);
+  revalidatePath("/admin/herbs");
+
+  redirect("/admin/sources?deleted=1");
 }

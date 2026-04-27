@@ -16,6 +16,7 @@ type AdminHerbsPageProps = {
     status?: "all" | "published" | "draft";
     featured?: "all" | "featured" | "not-featured";
     evidenceLevel?: "all" | EvidenceLevel;
+    deleted?: string;
   }>;
 };
 
@@ -40,6 +41,12 @@ export default async function AdminHerbsPage({
 
   return (
     <div className="space-y-8">
+      {params.deleted === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Herb record has been deleted successfully.
+        </section>
+      ) : null}
+      
       <AdminPageHeader
         eyebrow="Herbs"
         title="Manage herb records"

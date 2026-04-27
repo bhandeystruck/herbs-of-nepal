@@ -214,7 +214,7 @@ export async function createHerbAction(
     };
   }
 
-  redirect("/admin/herbs");
+  redirect("/admin/herbs/new?saved=1&created=1");
 }
 
 export async function updateHerbAction(
@@ -245,5 +245,46 @@ export async function updateHerbAction(
     };
   }
 
-  redirect(`/admin/herbs/${herbId}`);
+  redirect(`/admin/herbs/${herbId}?saved=1`);
+}
+
+export async function deleteHerbAction(formData: FormData) {
+  const herbId = getString(formData, "id");
+
+  if (!herbId) {
+    redirect("/admin/herbs?error=missing-id");
+  }
+
+  const herb = await db.herb.findUnique({
+    where: { id: herbId },
+    include: {
+      category: true,
+      sources: true,
+    },
+  });
+
+  if (!herb) {
+    redirect("/admin/herbs?error=not-found");
+  }
+
+  await db.herbSource.deleteMany({
+    where: {
+      herbId: herb.id,
+    },
+  });
+
+  await db.herb.delete({
+    where: { id: herb.id },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/herbs");
+  revalidatePath(`/herbs/${herb.slug}`);
+  revalidatePath("/categories");
+  revalidatePath(`/categories/${herb.category.slug}`);
+  revalidatePath("/admin");
+  revalidatePath("/admin/herbs");
+  revalidatePath(`/admin/herbs/${herb.id}`);
+
+  redirect("/admin/herbs?deleted=1");
 }

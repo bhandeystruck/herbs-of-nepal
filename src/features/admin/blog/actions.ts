@@ -161,3 +161,32 @@ export async function updateBlogPostAction(
 
   redirect(`/admin/blog/${blogId}?saved=1`);
 }
+
+export async function deleteBlogPostAction(formData: FormData) {
+  const blogId = getString(formData, "id");
+
+  if (!blogId) {
+    redirect("/admin/blog?error=missing-id");
+  }
+
+  const post = await db.blogPost.findUnique({
+    where: { id: blogId },
+  });
+
+  if (!post) {
+    redirect("/admin/blog?error=not-found");
+  }
+
+  await db.blogPost.delete({
+    where: { id: post.id },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/blog");
+  revalidatePath(`/blog/${post.slug}`);
+  revalidatePath("/admin");
+  revalidatePath("/admin/blog");
+  revalidatePath(`/admin/blog/${post.id}`);
+
+  redirect("/admin/blog?deleted=1");
+}

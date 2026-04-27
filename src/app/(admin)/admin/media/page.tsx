@@ -2,6 +2,8 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { MediaAssetCard } from "@/components/admin/media-asset-card";
 import { MediaGuidanceCard } from "@/components/admin/media-guidance-card";
 import { MediaPathReference } from "@/components/admin/media-path-reference";
+import { MediaUploadForm } from "@/components/admin/media-upload-form";
+import { uploadMediaAction } from "@/features/admin/media/actions";
 import {
   getAdminBlogMediaRecords,
   getAdminHerbMediaRecords,
@@ -24,6 +26,7 @@ export default async function AdminMediaPage() {
         title="Manage media conventions"
         description="Review current herb and blog assets, inspect storage paths, and keep editorial media conventions organized before upload tooling is added."
       />
+      <MediaUploadForm action={uploadMediaAction} />
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">

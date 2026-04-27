@@ -4,14 +4,30 @@ import { createHerbAction } from "@/features/admin/herbs/actions";
 import { ADMIN_HERB_EVIDENCE_OPTIONS } from "@/features/admin/herbs/form-config";
 import { getAdminHerbCategories } from "@/features/admin/herbs/queries";
 
+type NewHerbPageProps = {
+  searchParams: Promise<{
+    saved?: string;
+    created?: string;
+  }>;
+};
+
 /**
  * New herb admin page with real create action.
  */
-export default async function NewHerbPage() {
+export default async function NewHerbPage({
+  searchParams,
+}: NewHerbPageProps) {
+  const { saved, created } = await searchParams;
   const categories = await getAdminHerbCategories();
 
   return (
     <div className="space-y-8">
+      {saved === "1" && created === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Herb record has been created successfully.
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">

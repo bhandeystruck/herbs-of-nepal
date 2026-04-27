@@ -125,7 +125,7 @@ export async function createCategoryAction(
     };
   }
 
-  redirect("/admin/categories");
+  redirect("/admin/categories/new?saved=1&created=1");
 }
 
 export async function updateCategoryAction(
@@ -153,5 +153,45 @@ export async function updateCategoryAction(
     };
   }
 
-  redirect(`/admin/categories/${categoryId}`);
+  redirect(`/admin/categories/${categoryId}?saved=1`);
+}
+
+export async function deleteCategoryAction(formData: FormData) {
+  const categoryId = getString(formData, "id");
+
+  if (!categoryId) {
+    redirect("/admin/categories?error=missing-id");
+  }
+
+  const category = await db.category.findUnique({
+    where: { id: categoryId },
+    include: {
+      _count: {
+        select: {
+          herbs: true,
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    redirect("/admin/categories?error=not-found");
+  }
+
+  if (category._count.herbs > 0) {
+    redirect(`/admin/categories/${category.id}?error=has-herbs`);
+  }
+
+  await db.category.delete({
+    where: { id: category.id },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/categories");
+  revalidatePath(`/categories/${category.slug}`);
+  revalidatePath("/admin");
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/herbs/new");
+
+  redirect("/admin/categories?deleted=1");
 }

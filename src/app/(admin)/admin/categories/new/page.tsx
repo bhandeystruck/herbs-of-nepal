@@ -2,12 +2,29 @@ import Link from "next/link";
 import { CategoryForm } from "@/components/admin/category-form";
 import { createCategoryAction } from "@/features/admin/categories/actions";
 
+type NewCategoryPageProps = {
+  searchParams: Promise<{
+    saved?: string;
+    created?: string;
+  }>;
+};
+
 /**
  * New category admin page.
  */
-export default function NewCategoryPage() {
+export default async function NewCategoryPage({
+  searchParams,
+}: NewCategoryPageProps) {
+  const { saved, created } = await searchParams;
+
   return (
     <div className="space-y-8">
+      {saved === "1" && created === "1" ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          Category has been created successfully.
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="max-w-3xl">
           <Link
