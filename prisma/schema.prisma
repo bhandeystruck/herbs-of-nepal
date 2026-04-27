@@ -201,3 +201,28 @@ model BlogPost {
   @@index([isPublished])
   @@map("blog_posts")
 }
+
+model SiteSettings {
+  id                              String   @id @default(cuid())
+  siteName                        String
+  siteTagline                     String?
+  siteUrl                         String?
+  defaultSeoTitle                 String?
+  defaultSeoDescription           String?
+
+  logoPath                        String?
+  faviconPath                     String?
+
+  defaultReviewerName             String?
+  defaultReviewerRole             String?
+  editorialDisclaimer             String?
+  safetyDisclaimer                String?
+
+  requireHerbSourceBeforePublish  Boolean  @default(false)
+  requireHerbImageBeforePublish   Boolean  @default(false)
+  requireHerbReviewBeforePublish  Boolean  @default(false)
+  requireBlogImageBeforePublish   Boolean  @default(false)
+
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+}
